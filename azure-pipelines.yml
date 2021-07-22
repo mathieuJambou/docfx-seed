@@ -1,0 +1,29 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - checkout: self
+    submodules: true
+  - task: NuGetCommand@2
+    inputs:
+      command: 'custom'
+      arguments: 'install docfx.console'
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        docfx -version
+        docfx docfx.json
+  - task: AzureStaticWebApp@0
+    inputs:
+      app_location: '/_site'
+      output_location: ''
+      azure_static_web_apps_api_token: $(deployment_token)
